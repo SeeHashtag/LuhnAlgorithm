@@ -1,0 +1,53 @@
+Sub Main()
+'Change this to a Auto_Open() instead of Main() to have this run whenver an Excel workbook is opened.
+
+cellRange = 1
+partialCardNum = 0
+
+For cellRange = 2 To 2000
+    'if a cell has a value then perform the steps below, else skip it
+    If IsEmpty(Worksheets("Results").Range("B" & cellRange).Value) = False Then
+        
+        'change the worksheet name and range column name to fit your needs
+        partialCardNum = Worksheets("Results").Range("B" & cellRange).Value
+        
+        'if only 15 digits were provided then run this code, else skip this code
+        If Len(partialCardNum) = 15 Then
+            'add the non doubled digits together
+            sumNonDoubledCardDigits = 0
+            i = 0
+            For i = 2 To Len(partialCardNum) Step 2
+                sumNonDoubledCardDigits = sumNonDoubledCardDigits + Mid(partialCardNum, i, 1)
+            Next i
+            
+            'double the necessary digits, reduce digits that are 10 or higher by 9, then add them all together
+            sumDoubledCardDigits = 0
+            doubledCardDigit = 0
+            i = 0
+            For i = 1 To Len(partialCardNum) Step 2
+                'return the ith digit from the partialCardNum multiplied by 2
+                doubledCardDigit = (Mid(partialCardNum, i, 1) * 2)
+                If doubledCardDigit >= 10 Then
+                    doubledCardDigit = doubledCardDigit - 9
+                End If
+                
+                'add up all the digit values
+                sumDoubledCardDigits = sumDoubledCardDigits + doubledCardDigit
+                doubledCardDigit = 0
+            Next i
+            
+            'combine the sums
+            sumAllDigits = sumDoubledCardDigits + sumNonDoubledCardDigits
+            
+            'determine the final card digit
+            finalDigit = (sumAllDigits * 9) Mod 10
+            
+            'determine the full card number
+            totalCardNum = partialCardNum & finalDigit
+            
+            'Set the card's full value, change the worksheet name and range column to fit your needs
+            Worksheets("Results").Range("B" & cellRange).Value = totalCardNum
+        End If
+        
+    End If
+Next cellRange
